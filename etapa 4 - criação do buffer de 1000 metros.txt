@@ -1,0 +1,17 @@
+/* CRIA BUFFER DE 1000m em volta das unidades do Sacolão da Família*/
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN dentro_buffer_sacolao INTEGER;
+
+WITH buffer_sacolao AS (
+  SELECT ST_Buffer(geom, 1000) AS geom
+  FROM public.tcc_curitiba_maria_unidades_sacolao_familia
+)
+
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras s
+SET dentro_buffer_sacolao = CASE 
+  WHEN EXISTS (
+    SELECT 1
+    FROM buffer_sacolao b
+    WHERE ST_Intersects(s.geom, b.geom)
+  )
+  THEN 1 ELSE 0  END;

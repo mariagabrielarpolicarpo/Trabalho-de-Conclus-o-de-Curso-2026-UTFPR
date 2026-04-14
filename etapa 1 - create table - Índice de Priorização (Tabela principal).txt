@@ -1,0 +1,30 @@
+-- cria tabela de resultado que conterá o índice 
+CREATE TABLE public.tcc_curitiba_maria_resultado_setores_alvaras AS
+SELECT 
+    s.gid,
+    s.nm_bairro,
+    s.nm_regiona,
+    COUNT(e.geom) AS total_empresas,
+    s.renda,
+    s.dens_pop_k,
+    s.pessoas, 
+    s.domicilios,
+    ST_SetSRID(s.geom, 31982) AS geom 
+FROM 
+    public.tcc_curitiba_setores_censitarios AS s
+LEFT JOIN 
+    tcc_curitiba_maria_alvaras_empresas AS e
+ON 
+    ST_Intersects(
+        ST_SetSRID(s.geom, 31982), 
+        ST_Transform(e.geom, 31982)
+    )
+GROUP BY 
+    s.gid, 
+    s.nm_bairro, 
+    s.nm_regiona,
+    s.renda, 
+    s.dens_pop_k,
+    s.pessoas,
+    s.domicilios,
+    s.geom;

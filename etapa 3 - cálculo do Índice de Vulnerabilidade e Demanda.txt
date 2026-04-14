@@ -1,0 +1,8 @@
+-- CRIAÇÃO DO ÍNDICE DE VULNERABILIDADE E DEMANDA (IVD)
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN IF NOT EXISTS ivd  NUMERIC;
+
+-- Calcula a média ponderada baseada nos pesos
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras
+SET ivd = (renda_norm_prioridade * 0.5) + 
+(densidade_norm * 0.25) + (contagem_norm_prioridade * 0.25);

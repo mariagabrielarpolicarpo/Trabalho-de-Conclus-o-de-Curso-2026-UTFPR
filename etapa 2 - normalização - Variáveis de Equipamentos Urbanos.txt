@@ -1,0 +1,21 @@
+-- Cria campos para distância normalizada
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN dist_saude_norm DOUBLE PRECISION,
+ADD COLUMN dist_urbs_norm DOUBLE PRECISION,
+ADD COLUMN dist_terminal_norm DOUBLE PRECISION;
+-- Normaliza usando Min-Max Scaling, quanto menor a distância, mais próximo de 1
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras s
+SET 
+  dist_saude_norm = (estatistica.max_saude - s.dist_saude) / NULLIF((estatistica.max_saude - estatistica.min_saude), 0),
+  dist_urbs_norm = (estatistica.max_urbs - s.dist_urbs) / NULLIF((estatistica.max_urbs - estatistica.min_urbs), 0),
+  dist_terminal_norm = (estatistica.max_terminal - s.dist_terminal) / NULLIF((estatistica.max_terminal - estatistica.min_terminal), 0)
+FROM (
+  SELECT 
+    MIN(dist_saude) AS min_saude,
+    MAX(dist_saude) AS max_saude,
+    MIN(dist_urbs) AS min_urbs,
+    MAX(dist_urbs) AS max_urbs,
+    MIN(dist_terminal) AS min_terminal,
+    MAX(dist_terminal) AS max_terminal
+  FROM public.tcc_curitiba_maria_resultado_setores_alvaras
+) AS estatistica;

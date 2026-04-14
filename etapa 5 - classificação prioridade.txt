@@ -1,0 +1,22 @@
+-- criação da coluna classificação prioridade (baixa, média, alta)
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN classificacao_prioridade TEXT
+
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras t
+SET classificacao_prioridade = 
+    CASE 
+        WHEN t.dentro_buffer_sacolao = 1 OR t.indice_priorizacao IS NULL THEN 'baixa prioridade'
+        WHEN sub.percent_rank <= 0.10 THEN 'alta prioridade'
+        WHEN sub.percent_rank <= 0.30 THEN 'média prioridade'
+        ELSE 'baixa prioridade'
+    END
+FROM (
+    SELECT 
+        gid,  
+        CASE 
+            WHEN dentro_buffer_sacolao = 0 AND indice_priorizacao IS NOT NULL
+            THEN PERCENT_RANK() OVER (ORDER BY indice_priorizacao DESC)
+        END AS percent_rank
+    FROM public.tcc_curitiba_maria_resultado_setores_alvaras
+) sub
+WHERE t.gid = sub.gid; 

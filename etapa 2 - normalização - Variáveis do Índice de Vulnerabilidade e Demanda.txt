@@ -1,0 +1,28 @@
+/* ADICIONANDO COLUNAS DAS VARIÁVEIS QUE SERÃO NORMALIZADAS*/
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras 
+ADD COLUMN IF NOT EXISTS dens_log NUMERIC,
+ADD COLUMN IF NOT EXISTS contagem_log NUMERIC,
+ADD COLUMN IF NOT EXISTS densidade_norm NUMERIC,
+ADD COLUMN IF NOT EXISTS renda_norm_prioridade NUMERIC,
+ADD COLUMN IF NOT EXISTS contagem_norm_prioridade NUMERIC;
+/* Cálculo do LOG para densidade e contagem */
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras
+SET
+dens_log = LN(1 + dens_pop_k),
+contagem_log = LN(1 + total_empresas);
+
+/* NORMALIZAÇÃO (MIN-MAX SCALING) */
+
+WITH estatistica AS (
+    SELECT 
+        MIN(dens_pop_k) AS d_min, MAX(dens_pop_k) AS d_max,
+        MIN(renda) AS r_min, MAX(renda) AS r_max,
+        MIN(total_empresas) AS c_min, MAX(total_empresas) AS c_max
+    FROM public.tcc_curitiba_maria_resultado_setores_alvaras
+)
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras
+SET 
+    densidade_norm = (dens_pop_k - estatistica.d_min)::FLOAT / NULLIF((estatistica.d_max - estatistica.d_min), 0),
+   renda_norm_prioridade = (estatistica.r_max - renda)::FLOAT / NULLIF((estatistica.r_max - estatistica.r_min), 0),
+ contagem_norm_prioridade=(estatistica.c_max-total_empresas)::FLOAT/NULLIF((estatistica.c_max-estatistica.c_min), 0)
+FROM estatistica;

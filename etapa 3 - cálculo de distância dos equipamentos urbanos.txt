@@ -1,0 +1,54 @@
+-- Cria colunas de distância para cada um dos equipamentos
+
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN dist_saude DOUBLE PRECISION,
+ADD COLUMN dist_urbs DOUBLE PRECISION,
+ADD COLUMN dist_terminal DOUBLE PRECISION;
+
+-- Calcula a distância do setor ao equipamento mais próximo
+
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras s
+SET 
+  dist_saude = sub.dist_saude,
+  dist_urbs = sub.dist_urbs,
+  dist_terminal = sub.dist_terminal
+FROM (
+  SELECT s.gid,
+    -- Saúde (US + UPA)
+    (
+      SELECT ST_Distance(s.geom, saude.geom)
+      FROM (
+        SELECT geom FROM tcc_curitiba_maria_unidades_saude
+        UNION ALL
+        SELECT geom FROM tcc_curitiba_maria_upas_curitiba
+      ) AS saude
+      ORDER BY s.geom <-> saude.geom
+      LIMIT 1
+    ) AS dist_saude,
+
+    -- URBS
+    (
+      SELECT ST_Distance(s.geom, urbs.geom)
+      FROM tcc_curitiba_maria_postos_urbs urbs
+      ORDER BY s.geom <-> urbs.geom
+      LIMIT 1
+    ) AS dist_urbs,
+
+    -- Terminal
+    (
+      SELECT ST_Distance(s.geom, term.geom)
+      FROM tcc_curitiba_maria_terminal_onibus term
+      ORDER BY s.geom <-> term.geom
+      LIMIT 1
+    ) AS dist_terminal
+
+  FROM public.tcc_curitiba_maria_resultado_setores_alvaras s
+) AS sub
+WHERE s.gid = sub.gid;
+
+
+-- Calcula o critério de Equipamentos (E) 
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN E DOUBLE PRECISION;
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras
+SET E = (0.47 * dist_terminal_norm) + (0.35 * dist_urbs_norm) + (0.18 * dist_saude_norm); 

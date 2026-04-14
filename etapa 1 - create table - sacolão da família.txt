@@ -1,0 +1,14 @@
+-- Cria tabela com as unidades do sacolão da família
+
+CREATE TABLE tcc_curitiba_maria_unidades_sacolao_familia (
+    nome VARCHAR(150),
+    endereco TEXT,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION,
+);
+
+ALTER TABLE tcc_curitiba_maria_unidades_sacolao_familia
+ADD COLUMN geom geometry(Point, 31982);
+
+UPDATE tcc_curitiba_maria_unidades_sacolao_familia
+SET geom = ST_Transform(ST_SetSRID(ST_MakePoint(LON, LAT),4326),31982);

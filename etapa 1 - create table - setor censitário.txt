@@ -1,0 +1,16 @@
+-- cria tabela de setor censitário
+CREATE TABLE public.tcc_curitiba_setores_censitarios (
+    gid integer NOT NULL PRIMARY KEY,
+    cd_codseto varchar(10),
+    vl_area_to numeric,
+    vl_perimet numeric,
+    cd_codbair varchar(3),
+    nm_bairro varchar(100),
+    cd_codregi varchar(10),
+    nm_regiona varchar(100),
+    pessoas bigint,
+    domicilios bigint,
+    dens_pop_k numeric,
+    renda numeric,
+    geom geometry(MultiPolygon, 4326) 
+);

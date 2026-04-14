@@ -1,0 +1,55 @@
+-- Cria tabela de postos da URBS
+CREATE TABLE tcc_curitiba_maria_postos_urbs (
+    nome TEXT NOT NULL,
+    endereco TEXT NOT NULL,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION
+);
+
+ALTER TABLE tcc_curitiba_maria_postos_urbs
+ADD COLUMN geom geometry(Point, 31982);
+
+UPDATE tcc_curitiba_maria_postos_urbs
+SET geom = ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4326),31982)
+
+-- Cria tabela de upas
+CREATE TABLE tcc_curitiba_maria_upas_curitiba (
+    nome TEXT NOT NULL,
+    endereco TEXT NOT NULL,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION
+);
+
+ALTER TABLE tcc_curitiba_maria_upas_curitiba
+ADD COLUMN geom geometry(Point, 31982);
+
+UPDATE tcc_curitiba_maria_upas_curitiba
+SET geom = ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4326),31982);
+
+-- Cria tabela de unidades de saúde (US)
+CREATE TABLE tcc_curitiba_maria_unidades_saude (
+    nome TEXT NOT NULL,
+    endereco TEXT NOT NULL,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION
+);
+
+ALTER TABLE tcc_curitiba_maria_unidades_saude
+ADD COLUMN geom geometry(Point, 31982);
+
+UPDATE tcc_curitiba_maria_unidades_saude
+SET geom = ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4326),31982)
+
+-- Cria tabela de terminais de ônibus
+CREATE TABLE tcc_curitiba_maria_terminal_onibus (
+    nome TEXT NOT NULL,
+    endereco TEXT NOT NULL,
+    lat DOUBLE PRECISION,
+    lon DOUBLE PRECISION
+);
+
+ALTER TABLE tcc_curitiba_maria_terminal_onibus 
+ADD COLUMN geom geometry(Point, 31982);
+
+UPDATE tcc_curitiba_maria_terminal_onibus 
+SET geom = ST_Transform(ST_SetSRID(ST_MakePoint(lon, lat), 4326),31982)

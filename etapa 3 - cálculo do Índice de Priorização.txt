@@ -1,0 +1,5 @@
+-- Cria o índice de priorização com IVD e E
+ALTER TABLE public.tcc_curitiba_maria_resultado_setores_alvaras
+ADD COLUMN indice_priorizacao DOUBLE PRECISION;
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras
+SET indice_priorizacao = (ivd * 0.7) + (e * 0.3);

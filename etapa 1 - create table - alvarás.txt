@@ -1,0 +1,21 @@
+-- cria tabela de alvarás 
+CREATE TABLE tcc_curitiba_maria_alvaras_empresas (
+    nome_empresarial TEXT,
+    numero_do_alvara TEXT,
+    nome_fantasia TEXT,
+    data_expiracao TEXT,
+    endereco TEXT,
+    numero TEXT,
+    bairro TEXT,
+    cep TEXT,
+    atividade_principal TEXT, 
+    atividade_secundaria01 TEXT,
+    atividade_secundaria02 TEXT,
+    atividade_secundaria03 TEXT,
+    atividade_secundaria04 TEXT,
+    atividade_secundaria05 TEXT,
+    lat TEXT, 
+    lon TEXT, 
+    endereco_completo TEXT,
+    endereco_sem_bairro TEXT
+);

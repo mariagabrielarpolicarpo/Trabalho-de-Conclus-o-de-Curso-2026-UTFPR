@@ -1,0 +1,14 @@
+/* ALTERA A TABELA para excluir o CEASA da contagem de alvarás */ 
+UPDATE public.tcc_curitiba_maria_resultado_setores_alvaras AS s
+SET total_empresas = subconsulta.nova_contagem
+FROM (
+    SELECT 
+        s_inner.gid,
+        COUNT(e.geom) AS nova_contagem
+    FROM public.tcc_curitiba_setores_censitarios AS s_inner
+    LEFT JOIN tcc_curitiba_maria_alvaras_empresas AS e
+    ON ST_Intersects(ST_SetSRID(s_inner.geom, 31982), ST_Transform(e.geom, 31982))
+    WHERE NOT (e.endereco LIKE '%BR-116%' AND e.numero = '22881') OR e.geom IS NULL 
+    GROUP BY s_inner.gid
+) AS subconsulta
+WHERE s.gid = subconsulta.gid;
